@@ -1,0 +1,33 @@
+package mysql
+
+import(
+{% for value in imports %}"{{value}}"
+{% endfor %}
+)
+
+type {{camelTableName}} struct {
+     {% for value in columns %}{{value.CamelName}} {{value.GoType}} `json:"{{value.GoJsonTag}}" form:"{{value.GoJsonTag}}" {% if value.ColumnKey == "PRI" %}gorm:"primary_key"{% endif %}{% if  value.ColumnKey == "MUL" %}gorm:"index"{% endif %}` // {{value.Comment}}
+     {% endfor %}
+}
+
+func ( *{{camelTableName}}) TableName() string {
+	return "{{tableName}}"
+}
+
+{% for value in columns %}
+{% if value.Type == "json" %}
+// 请在model/mysql/addtion.go里定义{{value.GoType}}结构体
+func (c {{value.GoType}}) Value() (driver.Value, error) {
+	b, err := json.Marshal(c)
+	return string(b), err
+}
+
+func (c *{{value.GoType}}) Scan(input interface{}) error {
+	return json.Unmarshal(input.([]byte), c)
+}
+{% endif %}
+{% endfor %}
+
+
+
+

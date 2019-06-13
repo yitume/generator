@@ -1,0 +1,26 @@
+package trans
+
+import(
+    "strings"
+{% for value in imports %} "{{value}}"
+{% endfor %}
+)
+
+// Req{{camelTableName}}List 你可以把Req{{camelTableName}}List嵌套到需要自行修改的结构体中
+type Req{{camelTableName}}List struct {
+    ReqPage
+	mysql.{{camelTableName}}
+}
+
+// Req{{camelTableName}}Create 你可以把Req{{camelTableName}}Create或mysql.{{camelTableName}}嵌套到需要自行修改的结构体中
+type Req{{camelTableName}}Create = mysql.{{camelTableName}}
+
+// Req{{camelTableName}}Update 你可以把Req{{camelTableName}}Update或mysql.{{camelTableName}}嵌套到需要自行修改的结构体中
+type Req{{camelTableName}}Update = mysql.{{camelTableName}}
+
+{# 没有主键就没有Delete结构体 #}
+// Req{{camelTableName}}Delete 你可以把Req{{camelTableName}}Delete嵌套到需要自行修改的结构体中
+type Req{{camelTableName}}Delete struct {
+    {% for value in columns %}
+    {% if value.ColumnKey == "PRI" %}{{value.CamelName}} {{value.GoType}} `json:"{{value.GoJsonTag}}"`{% endif %}{% endfor %}
+}
